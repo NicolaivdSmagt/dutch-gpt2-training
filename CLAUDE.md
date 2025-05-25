@@ -19,6 +19,9 @@ The project consists of three main scripts:
 ### Data Preprocessing
 
 ```bash
+# Process a small test dataset (10k tokens) - good for testing
+python preprocess.py --dataset-size 10k
+
 # Process a small dataset (1M tokens)
 python preprocess.py --dataset-size 1M
 
@@ -32,6 +35,9 @@ python preprocess.py --dataset-size 10M --chunk-size 1024 --test-split 0.002 --o
 ### Model Training
 
 ```bash
+# Train a small model on test dataset (10k tokens) - good for testing
+python training.py --dataset-path processed_data/chunked_10k --model-size small
+
 # Train a small model on 1M tokens
 python training.py --dataset-path processed_data/chunked_1M --model-size small
 
@@ -60,11 +66,13 @@ python inference.py --model-path trained_models/gpt2-dutch-small-latest/final_mo
 ### Data Processing Pipeline
 
 The preprocessing script follows this workflow:
-1. Load dataset from Hugging Face (configurable size)
+1. Load dataset from Hugging Face (configurable size: 10k, 1M, 10M, 100M, 1B, 10B tokens)
 2. Create train/test split
 3. Tokenize using GPT-2 tokenizer
-4. Create fixed-size chunks (default: 1024 tokens)
+4. Concatenate all texts and create fixed-size chunks (default: 1024 tokens)
 5. Save processed dataset to disk
+
+**Note**: The chunking uses a concatenation-based approach that combines all texts before splitting into chunks, which is more efficient and stable than per-document chunking.
 
 ### Training Pipeline
 
@@ -85,11 +93,13 @@ The inference script provides:
 ## Performance Expectations
 
 - **Preprocessing**: 
+  - 10k tokens: ~3-5 seconds
   - 1M tokens: ~1 minute
   - 100M tokens: ~20-30 minutes
   - 10B tokens: ~24+ hours
 
 - **Training** (on g5.12xlarge with 4x A10G GPUs):
+  - Small model, 10k tokens: ~30 seconds (for testing)
   - Small model, 1M tokens: ~10-15 minutes
   - Small model, 100M tokens: ~10-12 hours
   - Medium model, 10M tokens: ~4-6 hours
@@ -98,3 +108,23 @@ The inference script provides:
   - Small model: ~10-20 tokens per second per GPU
   - Medium model: ~5-10 tokens per second per GPU
   - Large model: ~2-5 tokens per second per GPU
+
+## Troubleshooting
+
+### Common Issues and Solutions
+
+**Arrow data batching error during preprocessing:**
+- **Issue**: `ArrowInvalid: Column 2 named input_ids expected length X but got length Y`
+- **Solution**: Fixed in the latest version by using concatenation-based chunking instead of per-document chunking
+
+**Training fails with "evaluation_strategy" parameter error:**
+- **Issue**: `TypeError: TrainingArguments.__init__() got an unexpected keyword argument 'evaluation_strategy'`
+- **Solution**: Fixed in the latest version by updating to `eval_strategy` parameter for compatibility with newer transformers versions
+
+**Accelerate version compatibility:**
+- **Issue**: `ImportError: Using the 'Trainer' with 'PyTorch' requires 'accelerate>=0.26.0'`
+- **Solution**: Run `pip install 'accelerate>=0.26.0'` to update the package
+
+**Poor text generation quality:**
+- **Issue**: Generated text contains random words or nonsensical output
+- **Solution**: This is expected when training on small datasets (like 10k tokens). Use larger datasets (1M+ tokens) for better results
