@@ -15,15 +15,29 @@ Each component is implemented as a separate script to allow for easy experimenta
 ## Requirements
 
 - Python 3.8+
-- PyTorch 1.10+
-- Transformers 4.21+
-- Datasets 2.4+
+- PyTorch 2.0+
+- Transformers 4.30+
+- Datasets 2.12+
+- Accelerate 0.26+
 - CUDA-compatible GPU (at least one A10G for small models)
 
-You can install the required dependencies with:
+## Installation
 
+1. Create and activate a virtual environment:
 ```bash
-pip install torch transformers datasets wandb
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+Or install manually:
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install transformers datasets accelerate wandb numpy tqdm
 ```
 
 ## Hardware Setup
