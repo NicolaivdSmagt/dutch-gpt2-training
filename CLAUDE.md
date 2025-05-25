@@ -34,18 +34,20 @@ python preprocess.py --dataset-size 10M --chunk-size 1024 --test-split 0.002 --o
 
 ### Model Training
 
+**IMPORTANT**: Always use `accelerate launch` for multi-GPU training to avoid CUDA out of memory errors.
+
 ```bash
 # Train a small model on test dataset (10k tokens) - good for testing
-python training.py --dataset-path processed_data/chunked_10k --model-size small
+accelerate launch training.py --dataset-path processed_data/chunked_10k --model-size small
 
 # Train a small model on 1M tokens
-python training.py --dataset-path processed_data/chunked_1M --model-size small
+accelerate launch training.py --dataset-path processed_data/chunked_1M --model-size small
 
 # Train a medium model on 10M tokens with wandb logging
-python training.py --dataset-path processed_data/chunked_10M --model-size medium --use-wandb
+accelerate launch training.py --dataset-path processed_data/chunked_10M --model-size medium --use-wandb
 
-# Train with custom parameters
-python training.py --dataset-path processed_data/chunked_100M --model-size small --epochs 3 --batch-size 16 --gradient-accumulation-steps 4
+# Train with custom parameters (note smaller batch size for stability)
+accelerate launch training.py --dataset-path processed_data/chunked_100M --model-size small --epochs 1 --batch-size 4 --gradient-accumulation-steps 4
 ```
 
 ### Text Generation
@@ -124,6 +126,11 @@ The inference script provides:
 **Accelerate version compatibility:**
 - **Issue**: `ImportError: Using the 'Trainer' with 'PyTorch' requires 'accelerate>=0.26.0'`
 - **Solution**: Run `pip install 'accelerate>=0.26.0'` to update the package
+
+**CUDA out of memory errors during training:**
+- **Issue**: `torch.OutOfMemoryError: CUDA out of memory`
+- **Solution**: Use `accelerate launch` instead of running `python training.py` directly. This enables proper multi-GPU distributed training across all 4 A10G GPUs
+- **Setup**: Run `accelerate config` first to configure for 4-GPU training, or use the default config created automatically
 
 **Poor text generation quality:**
 - **Issue**: Generated text contains random words or nonsensical output

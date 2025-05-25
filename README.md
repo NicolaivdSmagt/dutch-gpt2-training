@@ -70,10 +70,12 @@ Expected runtime:
 
 ### 2. Model Training (`training.py`)
 
-This script trains a GPT-2 model on the preprocessed data.
+This script trains a GPT-2 model on the preprocessed data using distributed training across multiple GPUs.
+
+**IMPORTANT**: Always use `accelerate launch` for multi-GPU training to avoid memory issues:
 
 ```bash
-python training.py --dataset-path processed_data/chunked_1M --model-size small
+accelerate launch training.py --dataset-path processed_data/chunked_1M --model-size small
 ```
 
 Key parameters:
@@ -134,7 +136,7 @@ A full training workflow typically follows these steps:
 
 2. **Train a small model**: Start with a small model to verify the pipeline
    ```bash
-   python training.py --dataset-path processed_data/chunked_1M --model-size small --epochs 3
+   accelerate launch training.py --dataset-path processed_data/chunked_1M --model-size small --epochs 3
    ```
 
 3. **Test the model**: Generate text to evaluate model quality
@@ -145,18 +147,34 @@ A full training workflow typically follows these steps:
 4. **Scale up**: Increase dataset size and model size for better results
    ```bash
    python preprocess.py --dataset-size 10M
-   python training.py --dataset-path processed_data/chunked_10M --model-size medium
+   accelerate launch training.py --dataset-path processed_data/chunked_10M --model-size medium
    ```
 
 ## Performance Optimization
 
 ### Multi-GPU Training
 
-The training script automatically uses all available GPUs. For best performance on multi-GPU setups:
+The training script uses Hugging Face Accelerate for distributed training across all available GPUs. **Always use `accelerate launch`** instead of running the script directly.
 
-- Increase batch size (e.g., `--batch-size 16`)
+**Setup (first time only):**
+```bash
+accelerate config
+```
+Or use the automatic default configuration for 4-GPU training.
+
+**Training commands:**
+```bash
+# For small datasets (reduce batch size to avoid OOM)
+accelerate launch training.py --dataset-path processed_data/chunked_1M --model-size small --batch-size 4
+
+# For larger datasets
+accelerate launch training.py --dataset-path processed_data/chunked_100M --model-size small --batch-size 4 --gradient-accumulation-steps 4
+```
+
+**Performance tips:**
+- Use smaller batch sizes (4-8) per GPU to avoid memory issues
 - Enable gradient accumulation for larger effective batch sizes (e.g., `--gradient-accumulation-steps 4`)
-- Use mixed precision training (enabled by default)
+- Mixed precision training is enabled by default
 
 ### Dataset Processing
 
