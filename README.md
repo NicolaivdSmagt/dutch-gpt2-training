@@ -182,16 +182,7 @@ For large datasets:
 
 - Increase the number of processing workers (e.g., `--num-proc 16`)
 - Process data in smaller chunks if memory is limited
-- Consider using Spark for very large datasets (100B+ tokens)
-
-### AWS EMR for Massive Datasets
-
-For training on extremely large datasets (10B+ tokens), consider using AWS EMR (Elastic MapReduce):
-
-1. Create an EMR cluster with Spark
-2. Use the Spark-based preprocessing script template in `old/emr_preprocess_fixed.py`
-3. Process the data in parallel across the cluster
-4. Transfer the processed data to your training instance
+- The current preprocessing script can handle datasets up to 10B tokens efficiently
 
 ## Scaling to Multiple Instances
 
@@ -206,7 +197,7 @@ For training larger models or using larger datasets:
 The training script supports Weights & Biases (wandb) for experiment tracking:
 
 ```bash
-python training.py --use-wandb --wandb-project gpt2-dutch
+accelerate launch training.py --use-wandb --wandb-project gpt2-dutch
 ```
 
 This will log:
