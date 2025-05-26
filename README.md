@@ -61,12 +61,8 @@ Key parameters:
 - `--output-dir`: Directory to save processed data (default: "processed_data")
 - `--num-proc`: Number of processes for dataset processing (default: 8)
 
-Expected runtime:
-- 1M tokens: ~1 minute
-- 10M tokens: ~5 minutes
-- 100M tokens: ~20-30 minutes
-- 1B tokens: ~3-4 hours
-- 10B tokens: ~24+ hours
+Expected runtime on g5.12xlarge:
+- 10B tokens: ~3 hours
 
 ### 2. Model Training (`training.py`)
 
@@ -94,12 +90,7 @@ Model sizes and approximate parameters:
 - Large: ~774M parameters (36 layers, 1280 embedding dim, 20 attention heads)
 
 Expected training time on g5.12xlarge (4x A10G):
-- Small model, 1M tokens: ~10-15 minutes
-- Small model, 10M tokens: ~1-2 hours
-- Small model, 100M tokens: ~10-12 hours
-- Medium model, 1M tokens: ~30-45 minutes
-- Medium model, 10M tokens: ~4-6 hours
-- Large model, 1M tokens: ~1-2 hours
+- Small model, 10B tokens: ~11 hours
 
 ### 3. Inference (`inference.py`)
 

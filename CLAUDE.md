@@ -94,17 +94,11 @@ The inference script provides:
 
 ## Performance Expectations
 
-- **Preprocessing**: 
-  - 10k tokens: ~3-5 seconds
-  - 1M tokens: ~1 minute
-  - 100M tokens: ~20-30 minutes
-  - 10B tokens: ~24+ hours
+- **Preprocessing** (on g5.12xlarge): 
+  - 10B tokens: ~3 hours
 
 - **Training** (on g5.12xlarge with 4x A10G GPUs):
-  - Small model, 10k tokens: ~30 seconds (for testing)
-  - Small model, 1M tokens: ~10-15 minutes
-  - Small model, 100M tokens: ~10-12 hours
-  - Medium model, 10M tokens: ~4-6 hours
+  - Small model, 10B tokens: ~11 hours
 
 - **Inference**:
   - Small model: ~10-20 tokens per second per GPU
